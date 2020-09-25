@@ -1,0 +1,330 @@
+#------------Stress Wave Propagation----------------
+
+units                   metal
+dimension               3
+processors              * * *
+boundary                s s s
+atom_style              full
+read_data               Graphene_si_nano4.dat
+compute     		   	total all temp
+neighbor                2.0 bin
+neigh_modify            every 1 check yes
+
+#------------Potential----------------
+include         	   potential.mod
+
+
+# Setup minimization style
+#dump			minimization_traj all atom 100 minimization.lammpstrj
+#min_style		cg
+#min_modify		dmax 0.1 line quadratic
+#minimize		1.0e-7 1.e-7 1500 1500
+#undump			minimization_traj
+
+#------------Variables----------------
+variable      	c equal pe
+variable      	f equal vol
+variable      	g equal density
+variable      	h equal temp
+variable      	j equal press
+variable      	b equal 0.01
+
+
+#Define Regions for fixing
+region			CNTFix block 20.0 80.0 -10.0 20.0 10.0 INF
+
+
+#Define The Different Groups
+group 			Graph type 1
+group 			CNT type 2
+group			Fixd region CNTFix 
+group			CNTMob subtract CNT Fixd
+
+
+#Initialize Velocity
+velocity 		all create 1.0 4928459 rot yes dist gaussian
+
+#Equilibrate Run with NVT
+#Setting the Charge
+set 			type 1 charge 0.00
+set 			type 2 charge -0.00
+dump			TrajAll all atom 100 nvttrajectory.lammpstrj
+fix				1 CNTMob langevin 1.0 1.0 10.0 699486
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+fix				4 CNTMob nve
+compute			myTemp CNTMob temp
+
+
+# Setup output
+thermo_style    custom step temp c_myTemp yhi pe ke press
+thermo			100
+
+run             100000
+unfix         	1
+unfix			2
+unfix			3
+unfix			4
+
+undump			TrajAll
+uncompute		myTemp
+
+
+
+variable         e2 equal x[6968]
+variable         e3 equal y[6968]
+variable         e4 equal z[6968]
+variable         e5 equal x[7377]
+variable         e6 equal y[7377]
+variable         e7 equal z[7377]
+
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0001
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0001.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0001.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0002
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0002.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0002.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0003
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0003.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0003.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0004
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0004.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0004.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0005
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0005.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0005.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0006
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0006.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0006.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0007
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0007.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0007.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0008
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0008.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0008.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.0009
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.0009.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.0009.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.001
+set 			type 2 charge -1.0000
+
+dump			TrajAllAct all atom 1000 trajectory.001.lammpstrj
+
+fix                     def3 all print 20 " ${e2}   ${e3}  ${e4}   ${e5}  ${e6}   ${e7} " file BotPart.001.dat  screen no
+
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			        myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+run             200000
+
+undump			TrajAllAct
+unfix                   def3
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
