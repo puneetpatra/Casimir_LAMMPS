@@ -1,0 +1,126 @@
+#------------Stress Wave Propagation----------------
+
+units                   metal
+dimension               3
+processors              * * *
+boundary                s s s
+atom_style              full
+read_data               Graphene_DWNT_strucv3.dat
+compute     		   	total all temp
+neighbor                2.0 bin
+neigh_modify            every 1 check yes
+
+#------------Potential----------------
+include         	   potential.mod
+
+
+# Setup minimization style
+#dump			minimization_traj all atom 100 minimization.lammpstrj
+#min_style		cg
+#min_modify		dmax 0.1 line quadratic
+#minimize		1.0e-7 1.e-7 1500 1500
+#undump			minimization_traj
+
+#------------Variables----------------
+variable      	c equal pe
+variable      	f equal vol
+variable      	g equal density
+variable      	h equal temp
+variable      	j equal press
+variable      	b equal 0.01
+
+
+#Define Regions for fixing
+region			CNTFix block 40.0 55.0 -10.0 10.0 40.0 INF
+
+
+#Define The Different Groups
+group 			Graph type 1
+group 			CNT type 2
+group			Fixd region CNTFix 
+group			CNTMob subtract CNT Fixd
+
+
+#Initialize Velocity
+velocity 		all create 1.0 4928459 rot yes dist gaussian
+
+#Equilibrate Run with NVT
+#Setting the Charge
+set 			type 1 charge 0.00
+set 			type 2 charge -0.00
+dump			TrajAll all atom 100 nvttrajectory.lammpstrj
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+fix				4 CNTMob nve
+compute			myTemp CNTMob temp
+compute			myPECoul all pair lj/cut/coul/cut ecoul 
+compute			myPECas all pair table epair
+variable 		CoulPot equal c_myPECoul
+variable 		CasPot equal c_myPECas
+
+compute         6 CNTMob vacf
+variable		VelACF equal c_6[4]
+fix 			5 all print 1 "${CoulPot} ${CasPot} ${VelACF}" file "energy_nvttrajectory.dat" screen "no"
+
+# Setup output
+thermo_style    custom step temp c_myTemp yhi pe ke press
+thermo			100
+
+run             100000
+unfix         	1
+unfix			2
+unfix			3
+unfix			4
+unfix			5
+undump			TrajAll
+uncompute		myTemp
+uncompute		6
+variable		VelACF delete
+
+
+group			BotPartGp id 4752
+
+
+#Final Run with charges
+########################################################################
+#Setting the Charge
+set 			type 1 charge 0.00002
+set 			type 2 charge -1.000
+
+dump			TrajAllAct all atom 1000 trajectory.00001.lammpstrj
+dump			BotPart BotPartGp custom 10 BotPart.00001.dat id x y z 
+fix				2 Graph setforce 0.0 0.0 0.0
+fix				3 Fixd setforce 0.0 0.0 0.0
+compute			myTemp CNTMob temp
+fix				1 CNTMob langevin 1.0 1.0  10.0 699486
+fix				4 CNTMob nve
+
+compute         6 CNTMob vacf
+variable		VelACF equal c_6[4]
+variable		Rxx	equal c_6[1]
+variable		Ryy	equal c_6[2]
+variable		Rzz	equal c_6[3]
+fix 			5 all print 1 "${CoulPot} ${CasPot} ${Rxx} ${Ryy} ${Rzz} ${VelACF}" file "energy_autocorr.dat" screen "no"
+
+run             400000
+
+undump			TrajAllAct
+undump			BotPart
+unfix			2
+unfix			3
+uncompute		myTemp
+unfix         	1
+unfix			4
+unfix			5
+uncompute		6
+variable		VelACF delete
+
+
+
+
+
+
+
+
+
